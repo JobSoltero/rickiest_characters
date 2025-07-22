@@ -15,9 +15,12 @@
 
 .appHeader {
   width: 100%;
-  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+  text-align: right;
   flex-shrink: 0;
-  margin-bottom: 20px;
+  padding-right: 50px;
+  box-sizing: border-box;
 }
 
 .logo {
@@ -45,5 +48,10 @@
   .mainContent {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .appHeader {
+    text-align: center;
+    padding-right: 0;
   }
 }
