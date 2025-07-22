@@ -1,26 +1,28 @@
 'use client';
 
 import React from 'react';
-import { useState } from 'react';
 import styles from './CharacterCard.module.css';
 import { Character } from '@/types';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { addFavoriteStart, removeFavoriteStart } from '@/redux/features/favorites/favoritesSlice';
 
 interface CharacterCardProps {
   character: Character;
-  isLiked?: boolean;
   isSelected?: boolean;
   onCardClick?: (id: number) => void;
-  onLikeClick?: (id: number, isLiked: boolean) => void;
 }
 
 export default function CharacterCard({
   character,
-  isLiked = false,
   isSelected = false,
   onCardClick,
-  onLikeClick,
 }: CharacterCardProps) {
-  const [localIsLiked, setLocalIsLiked] = useState(isLiked);
+  const dispatch = useDispatch();
+  const isFavorite = useSelector((state: RootState) =>
+    state.favorites.favoriteIds.includes(String(character.id))
+  );
+
   const finalImageUrl = character.image || '/hero-fallback.jpg';
 
   const handleCardClick = () => {
@@ -29,9 +31,11 @@ export default function CharacterCard({
 
   const handleLikeClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    const newLikedState = !localIsLiked;
-    setLocalIsLiked(newLikedState);
-    onLikeClick?.(character.id, newLikedState);
+    if (isFavorite) {
+      dispatch(removeFavoriteStart(String(character.id)));
+    } else {
+      dispatch(addFavoriteStart(character));
+    }
   };
 
   return (
@@ -53,12 +57,12 @@ export default function CharacterCard({
       <button
         className={styles.likeButton}
         onClick={handleLikeClick}
-        aria-label={localIsLiked ? `Quitar "me gusta" a ${character.name}` : `Dar "me gusta" a ${character.name}`}
+        aria-label={isFavorite ? `Quitar de favoritos a ${character.name}` : `Añadir a favoritos a ${character.name}`}
       >
-        <span className={styles.heartIcon} style={{ color: localIsLiked ? 'red' : 'white' }}>
+        <span className={styles.heartIcon} style={{ color: isFavorite ? 'var(--primary-green)' : 'white' }}>
           ❤
         </span>{' '}
-        Like
+        Favorito
       </button>
     </div>
   );

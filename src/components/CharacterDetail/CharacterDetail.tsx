@@ -1,30 +1,38 @@
 import React from 'react';
 import styles from './CharacterDetail.module.css';
+import { Character } from '@/types';
 
 interface CharacterDetailProps {
-  imageUrl?: string;
-  name?: string;
-  status?: 'Alive' | 'Dead' | 'unknown';
-  species?: string;
-  origin?: string;
-  location?: string;
-  gender?: string;
-  episodes?: number;
+  character?: Character | null;
 }
 
-export default function CharacterDetail({
-  imageUrl = '/hero-fallback.jpg',
-  name = 'Nombre Desconocido',
-  status = 'unknown',
-  species = 'Desconocido',
-  origin = 'Desconocido',
-  location = 'Desconocido',
-  gender = 'Desconocido',
-  episodes = 0,
-}: CharacterDetailProps) {
+export default function CharacterDetail({ character }: CharacterDetailProps) {
+  if (!character) {
+    return (
+      <div className={styles.card} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', textAlign: 'center', backgroundColor: '#2b2b2b' }}>
+        <p style={{ fontSize: '1.2rem', color: '#ccc' }}>Selecciona un personaje para ver sus detalles.</p>
+      </div>
+    );
+  }
+
+  const {
+    image: imageUrl = '/hero-fallback.jpg',
+    name = 'Nombre Desconocido',
+    status = 'unknown',
+    species = 'Desconocido',
+    origin,
+    location,
+    gender = 'Desconocido',
+    episode = [],
+  } = character;
+
+  const episodes = episode.length;
+  const originName = origin?.name ?? 'Desconocido';
+  const locationName = location?.name ?? 'Desconocido';
+
   const isAlive = status === 'Alive';
-  const indicatorText = isAlive ? 'LIVE' : 'DEAD';
-  const indicatorDotClass = isAlive ? styles.aliveDot : styles.deadDot;
+  const indicatorText = status === 'unknown' ? 'UNKNOWN' : isAlive ? 'LIVE' : 'DEAD';
+  const indicatorDotClass = status === 'unknown' ? '' : isAlive ? styles.aliveDot : styles.deadDot;
 
   return (
     <div
@@ -42,7 +50,7 @@ export default function CharacterDetail({
           <p className={styles.characterName}>{name}</p>
           <p className={styles.characterSpeciesOrigin}>
             {species}
-            {origin && origin !== 'unknown' ? `, ${origin}` : ''} {/* Agrega origen si existe */}
+            {originName && originName !== 'unknown' ? `, from ${originName}` : ''}
           </p>
         </div>
 
@@ -54,7 +62,7 @@ export default function CharacterDetail({
           </p>
           <p>
             <span className={styles.infoLabel}>Ubicación</span>
-            {location}
+            {locationName}
           </p>
           <p>
             <span className={styles.infoLabel}>Género</span>
