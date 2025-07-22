@@ -1,9 +1,13 @@
 :root {
-  --background-color-fallback: #0d1117; 
-  --primary-green: #4CAF50; 
-  --dark-grey-panel: #202020; 
-  --light-grey-text: #E0E0E0;
+  --max-width: 1280px;
+  --header-height: 80px;
+  --primary-green: #9aff00; /* Puedes ajustar este color al verde exacto de tu diseño */
+  --text-color-light: #eee;
+  --text-color-dark: #333;
+  --panel-background: #1a1a1a;
+  --card-background: #2b2b2b;
 }
+
 
 html,
 body {
