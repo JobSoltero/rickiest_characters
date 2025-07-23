@@ -1,6 +1,6 @@
 // src/app/page.tsx
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CharacterCard from '@/components/CharacterCard/CharacterCard';
 import CharacterDetail from '@/components/CharacterDetail/CharacterDetail';
@@ -15,18 +15,56 @@ export default function HomePage() {
   const { characters, loading, error, selectedCharacterId, searchTerm } = useSelector(
     (state: RootState) => state.characters
   );
+  // Correctamente extraemos el array de personajes favoritos del slice.
+  const { favorites: favoriteCharacters } = useSelector((state: RootState) => state.favorites);
+
+  const [showFavoritesDropdown, setShowFavoritesDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // --- Estado para la paginación ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const CHARACTERS_PER_PAGE = 4;
 
   useEffect(() => {
     dispatch(fetchCharactersStart());
     dispatch(fetchFavoritesStart());
   }, [dispatch]);
 
+  // Efecto para cerrar el dropdown si se hace clic fuera de él
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowFavoritesDropdown(false);
+      }
+    }
+    // Añadir el listener cuando el dropdown está visible
+    if (showFavoritesDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    // Limpiar el listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showFavoritesDropdown]);
+
+  // Resetea la página a 1 cuando cambia el término de búsqueda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const handleCardClick = (id: number) => {
     dispatch(selectCharacter(id));
+    setShowFavoritesDropdown(false); // Cierra el dropdown al seleccionar un personaje
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setSearchTerm(event.target.value));
+  };
+
+  // Función para alternar la visibilidad del menú desplegable
+  const handleToggleFavorites = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Evita que el listener del documento lo cierre inmediatamente
+    setShowFavoritesDropdown((prev) => !prev);
   };
 
   const selectedCharacter = characters.find(c => c.id === selectedCharacterId);
@@ -34,6 +72,24 @@ export default function HomePage() {
   const filteredCharacters = characters.filter(character =>
     character.name.toLowerCase().includes((searchTerm || '').toLowerCase())
   );
+
+  // --- Lógica de Paginación ---
+  const totalPages = Math.ceil(filteredCharacters.length / CHARACTERS_PER_PAGE);
+  const indexOfLastCharacter = currentPage * CHARACTERS_PER_PAGE;
+  const indexOfFirstCharacter = indexOfLastCharacter - CHARACTERS_PER_PAGE;
+  const currentCharacters = filteredCharacters.slice(indexOfFirstCharacter, indexOfLastCharacter);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   if (loading) return <Loading />;
   if (error) return <p style={{ color: 'red', textAlign: 'center' }}>Error: {error}</p>;
@@ -45,37 +101,69 @@ export default function HomePage() {
       </aside>
 
       <section className={pageStyles.rightPanel}>
-        <div className={pageStyles.searchAndFavs}>
-          <input
-            type="text"
-            placeholder="🔍 Find your character..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #555', flexGrow: 1, backgroundColor: '#333', color: '#eee' }}
-          />
-          <button style={{ padding: '10px 15px', borderRadius: '5px', border: 'none', backgroundColor: 'var(--primary-green)', color: 'white', cursor: 'pointer' }}>
-            FAVS
-          </button>
-        </div>
+        <input
+          type="text"
+          placeholder="🔍 Find your character..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className={pageStyles.searchInput}
+        />
 
-        <div className={pageStyles.characterGrid}>
-          {filteredCharacters.length > 0 ? (
-            filteredCharacters.map((character) => (
-              <CharacterCard
-                key={character.id}
-                character={character}
-                onCardClick={handleCardClick}
-                isSelected={character.id === selectedCharacterId}
-              />
-            ))
-          ) : (
-            <p style={{ color: '#ccc', textAlign: 'center', gridColumn: '1 / -1' }}>No se encontraron personajes con ese nombre.</p>
+        <div className={pageStyles.gridAndPaginationContainer}>
+          <div className={pageStyles.characterGrid}>
+            {/* Se itera sobre los personajes de la página actual */}
+            {currentCharacters.length > 0 ? (
+              currentCharacters.map((character) => (
+                <CharacterCard
+                  key={character.id}
+                  character={character}
+                  onCardClick={handleCardClick}
+                  isSelected={character.id === selectedCharacterId}
+                />
+              ))
+            ) : (
+              <p style={{ color: '#ccc', textAlign: 'center', gridColumn: '1 / -1' }}>No se encontraron personajes con ese nombre.</p>
+            )}
+          </div>
+
+          {/* --- Controles de Paginación Vertical --- */}
+          {totalPages > 1 && (
+            <div className={pageStyles.pagination}>
+              <button onClick={handlePrevPage} disabled={currentPage === 1} aria-label="Página anterior">
+                ▲
+              </button>
+              <span>{currentPage} / {totalPages}</span>
+              <button onClick={handleNextPage} disabled={currentPage === totalPages} aria-label="Página siguiente">
+                ▼
+              </button>
+            </div>
           )}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px' }}>
-          <button style={{ padding: '8px 12px', backgroundColor: '#555', color: 'white', borderRadius: '5px', border: 'none' }}>Favs</button>
-          
+        <div className={pageStyles.bottomButtonContainer} ref={dropdownRef}>
+          <button className={pageStyles.bottomButton} onClick={handleToggleFavorites}>
+            Ver Favoritos
+          </button>
+
+          {/* Menú desplegable de favoritos - Renderizado condicional */}
+          {showFavoritesDropdown && (
+            <div className={pageStyles.favoritesDropdown}>
+              {favoriteCharacters.length > 0 ? (
+                favoriteCharacters.map((favCharacter) => (
+                  <div
+                    key={favCharacter.id}
+                    className={pageStyles.dropdownItem}
+                    onClick={() => handleCardClick(Number(favCharacter.id))}
+                  >
+                    <img src={favCharacter.image} alt={favCharacter.name} className={pageStyles.dropdownImage} />
+                    <span>{favCharacter.name}</span>
+                  </div>
+                ))
+              ) : (
+                <p className={pageStyles.dropdownEmpty}>No hay favoritos todavía.</p>
+              )}
+            </div>
+          )}
         </div>
       </section>
     </>

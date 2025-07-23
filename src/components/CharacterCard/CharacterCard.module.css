@@ -5,13 +5,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 5px; /* Ajuste de padding para la nueva altura */
+  padding: 5px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   border: 2px solid transparent;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  width: 150px;
-  height: 180px; /* Altura reducida para un diseño más compacto */
+  width: 140px;   /* Reducimos el tamaño de la tarjeta */
+  height: 165px;
   gap: 4px; /* Espacio uniforme entre los elementos */
 }
 
@@ -25,8 +25,8 @@
 }
 
 .imageContainer {
-  width: 100px;
-  height: 100px;
+  width: 90px;  /* Reducimos la imagen */
+  height: 90px;
   flex-shrink: 0; /* Evita que el contenedor de la imagen se encoja */
   
   border-radius: 4px;
@@ -43,7 +43,7 @@
 }
 
 .characterName {
-  font-size: 1.1rem;
+  font-size: 1rem; /* Reducimos el tamaño de la fuente */
   font-weight: 500;
   color: #eee;
   margin: 0; /* El gap se encarga del espaciado */
@@ -53,7 +53,7 @@
   white-space: normal;
   word-break: break-word;
   
-  min-height: 2.6rem;
+  min-height: 2.2rem; /* Ajustamos la altura mínima para el nombre */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,9 +66,9 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 3px;
-  font-size: 0.9em;
-  padding: 3px 8px;
+  gap: 4px;
+  font-size: 0.8em; /* Reducimos el tamaño de la fuente del botón */
+  padding: 2px 6px;
   border-radius: 20px;
   transition: background-color 0.2s ease;
 }
