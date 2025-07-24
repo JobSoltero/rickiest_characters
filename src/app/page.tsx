@@ -7,7 +7,7 @@ import CharacterDetail from '@/components/CharacterDetail/CharacterDetail';
 import pageStyles from './page.module.css';
 import { AppDispatch, RootState } from '@/redux/store';
 import { fetchCharactersStart, selectCharacter, setSearchTerm } from '@/redux/features/characters/charactersSlice';
-import { fetchFavoritesStart } from '@/redux/features/favorites/favoritesSlice';
+import { fetchFavoritesStart, removeFavoriteStart } from '@/redux/features/favorites/favoritesSlice';
 import Loading from './loading';
 
 export default function HomePage() {
@@ -52,11 +52,6 @@ export default function HomePage() {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  const handleCardClick = (id: number) => {
-    dispatch(selectCharacter(id));
-    setShowFavoritesDropdown(false); // Cierra el dropdown al seleccionar un personaje
-  };
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setSearchTerm(event.target.value));
   };
@@ -66,12 +61,41 @@ export default function HomePage() {
     event.stopPropagation(); // Evita que el listener del documento lo cierre inmediatamente
     setShowFavoritesDropdown((prev) => !prev);
   };
+  
+  const handleRemoveFavorite = (event: React.MouseEvent, characterId: string) => {
+    event.stopPropagation(); // Evita que se dispare el click del item
+    dispatch(removeFavoriteStart(characterId));
+  };
 
-  const selectedCharacter = characters.find(c => c.id === selectedCharacterId);
+  const handleCardClick = (id: number) => {
+    dispatch(selectCharacter(id));
+    setShowFavoritesDropdown(false); // Cierra el dropdown al seleccionar un personaje
+  };
 
   const filteredCharacters = characters.filter(character =>
     character.name.toLowerCase().includes((searchTerm || '').toLowerCase())
   );
+
+  const selectedCharacter = characters.find(c => c.id === selectedCharacterId);
+
+  // --- Lógica para la navegación en el detalle ---
+  const currentCharacterIndex = selectedCharacterId
+    ? filteredCharacters.findIndex(c => c.id === selectedCharacterId)
+    : -1;
+
+  const handlePrevCharacter = () => {
+    if (currentCharacterIndex > 0) {
+      const prevCharacterId = filteredCharacters[currentCharacterIndex - 1].id;
+      dispatch(selectCharacter(prevCharacterId));
+    }
+  };
+
+  const handleNextCharacter = () => {
+    if (currentCharacterIndex > -1 && currentCharacterIndex < filteredCharacters.length - 1) {
+      const nextCharacterId = filteredCharacters[currentCharacterIndex + 1].id;
+      dispatch(selectCharacter(nextCharacterId));
+    }
+  };
 
   // --- Lógica de Paginación ---
   const totalPages = Math.ceil(filteredCharacters.length / CHARACTERS_PER_PAGE);
@@ -95,9 +119,15 @@ export default function HomePage() {
   if (error) return <p style={{ color: 'red', textAlign: 'center' }}>Error: {error}</p>;
   
   return (
-    <>
+    <div className={pageStyles.container}>
       <aside className={pageStyles.leftPanel}>
-        <CharacterDetail character={selectedCharacter} />
+        <CharacterDetail 
+          character={selectedCharacter} 
+          onPrevClick={handlePrevCharacter}
+          onNextClick={handleNextCharacter}
+          isPrevDisabled={currentCharacterIndex <= 0}
+          isNextDisabled={currentCharacterIndex >= filteredCharacters.length - 1 || currentCharacterIndex === -1}
+        />
       </aside>
 
       <section className={pageStyles.rightPanel}>
@@ -157,6 +187,13 @@ export default function HomePage() {
                   >
                     <img src={favCharacter.image} alt={favCharacter.name} className={pageStyles.dropdownImage} />
                     <span>{favCharacter.name}</span>
+                    <button
+                      className={pageStyles.deleteFavoriteButton}
+                      onClick={(e) => handleRemoveFavorite(e, String(favCharacter.id))}
+                      aria-label={`Quitar de favoritos a ${favCharacter.name}`}
+                    >
+                      🗑️
+                    </button>
                   </div>
                 ))
               ) : (
@@ -166,6 +203,6 @@ export default function HomePage() {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }

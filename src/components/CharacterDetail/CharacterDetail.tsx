@@ -4,9 +4,16 @@ import { Character } from '@/types';
 
 interface CharacterDetailProps {
   character?: Character | null;
+  onPrevClick?: () => void;
+  onNextClick?: () => void;
+  isPrevDisabled?: boolean;
+  isNextDisabled?: boolean;
 }
 
-export default function CharacterDetail({ character }: CharacterDetailProps) {
+export default function CharacterDetail({ 
+  character, onPrevClick, onNextClick, 
+  isPrevDisabled = true, isNextDisabled = true 
+}: CharacterDetailProps) {
   if (!character) {
     return (
       <div className={styles.card} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', textAlign: 'center', backgroundColor: '#2b2b2b' }}>
@@ -39,6 +46,23 @@ export default function CharacterDetail({ character }: CharacterDetailProps) {
       className={styles.card}
       style={{ backgroundImage: `url(${imageUrl})` }}
     >
+      {/* Botones de navegación, solo visibles en móvil */}
+      <button
+        onClick={onPrevClick}
+        disabled={isPrevDisabled}
+        className={`${styles.mobileNavButton} ${styles.prevButton}`}
+        aria-label="Personaje anterior"
+      >
+        &#9664;
+      </button>
+      <button
+        onClick={onNextClick}
+        disabled={isNextDisabled}
+        className={`${styles.mobileNavButton} ${styles.nextButton}`}
+        aria-label="Personaje siguiente"
+      >
+        &#9654;
+      </button>
       <div className={styles.liveIndicator}>
         <span className={`${styles.liveDot} ${indicatorDotClass}`}></span>
         {indicatorText}

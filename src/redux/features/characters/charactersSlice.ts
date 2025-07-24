@@ -28,6 +28,12 @@ const charactersSlice = createSlice({
     fetchCharactersSuccess(state, action: PayloadAction<Character[]>) {
       state.characters = action.payload;
       state.loading = false;
+      // Al cargar los personajes, seleccionamos el primero por defecto.
+      if (action.payload && action.payload.length > 0) {
+        state.selectedCharacterId = action.payload[0].id;
+      } else {
+        state.selectedCharacterId = null;
+      }
     },
     fetchCharactersFailure(state, action: PayloadAction<string>) {
       state.loading = false;
