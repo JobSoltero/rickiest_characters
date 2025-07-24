@@ -1,0 +1,21 @@
+:root {
+  --max-width: 1280px;
+  --header-height: 80px;
+  --primary-green: #9aff00; /* Puedes ajustar este color al verde exacto de tu diseño */
+  --text-color-light: #eee;
+  --text-color-dark: #333;
+  --panel-background: #1a1a1a;
+  --card-background: #2b2b2b;
+}
+
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh; 
+  overflow: hidden; 
+  font-family: Arial, sans-serif; 
+  color: #fff; 
+  background-color: var(--background-color-fallback); 
+}

@@ -1,0 +1,180 @@
+.card {
+  width: 100%;
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #2b2b2b;
+  min-height: 450px;
+  height: auto;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+}
+
+.contentOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* Eliminar 'height' fijo y usar 'max-height' y 'padding' para el control */
+  max-height: 60%; /* Permite que crezca hasta el 60% de la tarjeta */
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  padding: 20px; /* Este padding asegura espacio interno para el texto */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Aún empuja el contenido hacia abajo dentro del overlay */
+  color: #eee;
+  z-index: 1;
+}
+
+.liveIndicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0,0,0,0.6);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8em;
+  z-index: 2;
+}
+
+.liveDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.deadDot {
+  background-color: red;
+}
+
+.aliveDot {
+  background-color: lime;
+}
+
+.nameSection {
+  text-align: left;
+  margin-bottom: 20px; /* Espacio entre la sección de nombre y la cuadrícula */
+  width: 100%;
+  /* No necesitamos padding aquí porque el padding del .contentOverlay ya lo maneja */
+}
+
+.characterName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--primary-green);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.characterSpeciesOrigin {
+  font-size: 0.95rem;
+  color: #ccc;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.infoGrid p {
+  margin: 0;
+  font-size: 0.9rem;
+  background-color: rgba(42, 42, 42, 0.8);
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+}
+
+.infoLabel {
+  font-weight: 600;
+  color: var(--primary-green);
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+}
+
+.mobileNavButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.mobileNavButton:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.mobileNavButton:disabled {
+  background-color: rgba(51, 51, 51, 0.5);
+  color: #888;
+  cursor: not-allowed;
+}
+
+.prevButton {
+  left: 10px;
+}
+
+.nextButton {
+  right: 10px;
+}
+
+/* Botón para volver, oculto por defecto en escritorio */
+.backButton {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  z-index: 2;
+  transition: background-color 0.2s ease;
+}
+
+.backButton:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Mostramos el botón solo en pantallas móviles */
+@media (max-width: 768px) {
+  .mobileNavButton {
+    display: flex;
+  }
+
+  .backButton {
+    display: block;
+  }
+}
